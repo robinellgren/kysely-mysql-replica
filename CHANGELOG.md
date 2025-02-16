@@ -1,5 +1,11 @@
 # kysely-replica-dialect
 
+## 0.1.1
+
+### Patch Changes
+
+- [`21beb19`](https://github.com/robinellgren/kysely-replica-dialect/commit/21beb193600e6e7d6660dab025791f6ee1259ee7) Thanks [@robinellgren](https://github.com/robinellgren)! - Minor documentation improvements
+
 ## 0.1.0
 
 ### Minor Changes
