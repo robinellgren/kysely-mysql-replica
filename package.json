@@ -1,7 +1,7 @@
 {
   "name": "kysely-mysql-replica",
   "author": "robinellgren",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Kysely dialect for MySQL with support for replicas",
   "license": "MIT",
   "keywords": [
