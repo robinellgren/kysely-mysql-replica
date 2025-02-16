@@ -1,5 +1,11 @@
 # kysely-mysql-replica
 
+## 0.3.0
+
+### Minor Changes
+
+- [`032c068`](https://github.com/robinellgren/kysely-mysql-replica/commit/032c0681d9d735686e5f2d95499b86c49a4ae707) Thanks [@robinellgren](https://github.com/robinellgren)! - Use type inference instead of declaring
+
 ## 0.2.0
 
 ### Minor Changes
