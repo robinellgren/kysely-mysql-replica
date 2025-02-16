@@ -28,9 +28,12 @@
         "dist"
     ],
     "scripts": {
+        "lint": "eslint . && prettier --check .",
         "build": "tsup ./src/index.ts",
+        "lint:fix": "eslint . --fix",
         "tsc": "tsc",
-        "test": "vitest --typecheck --watch false"
+        "test": "vitest --typecheck --watch false",
+        "coverage": "vitest run --coverage test/"
     },
     "repository": {
         "type": "git",
@@ -45,7 +48,13 @@
         "testcontainers": "^10.18.0",
         "tsup": "^8.3.6",
         "typescript": "^5.7.3",
-        "vitest": "^3.0.5"
+        "vitest": "^3.0.5",
+        "@eslint/js": "^9.20.0",
+        "eslint": "^9.20.1",
+        "eslint-config-prettier": "^10.0.1",
+        "eslint-plugin-perfectionist": "^4.9.0",
+        "prettier": "^3.3.2",
+        "typescript-eslint": "^8.24.0"
     },
     "peerDependencies": {
         "kysely": "^0.27.5"
