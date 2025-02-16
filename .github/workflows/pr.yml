@@ -26,9 +26,6 @@ jobs:
       - name: Lint
         run: pnpm run lint
 
-      - name: Typecheck
-        run: pnpm run typecheck
-
       - name: Test
         run: pnpm run test
 
@@ -36,7 +33,4 @@ jobs:
         run: pnpm run build
 
       - name: Check types and module resolution
-        run: npx @arethetypeswrong/cli --pack
-
-      #- name: Check for unused files, deps and exports
-      #  run: pnpm run knip
+        run: pnpm run check-types
