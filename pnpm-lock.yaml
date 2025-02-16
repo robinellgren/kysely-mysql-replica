@@ -7,10 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      kysely:
-        specifier: '*'
-        version: 0.27.5
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: 0.17.3
@@ -51,6 +47,9 @@ importers:
       jiti:
         specifier: 2.4.2
         version: 2.4.2
+      kysely:
+        specifier: ^0.27.5
+        version: 0.27.5
       mysql2:
         specifier: ^3.12.0
         version: 3.12.0
