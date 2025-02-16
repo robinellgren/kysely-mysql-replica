@@ -111,24 +111,6 @@ describe.sequential("mysql replica dialect", async () => {
     });
   });
 
-  it("should work as normal mysql dialect when using single pool", async () => {
-    const dbWithSinglePool = new Kysely<TestDB>({
-      dialect: new MysqlReplicaDialect({ pool: poolWithRows }),
-    });
-    // insert first
-    await dbWithSinglePool
-      .insertInto("Pets")
-      .values([{ firstName: "Rin-Tin-Tin", ownerId: 1 }])
-      .execute();
-    // since only one pool, same db instance is used and result works
-    const robinsPet = await dbWithSinglePool
-      .selectFrom("Pets")
-      .selectAll()
-      .where("firstName", "=", "Rin-Tin-Tin")
-      .executeTakeFirst();
-    expect(robinsPet?.ownerId).toBe(1);
-  });
-
   it("should work when write and read is the same pool ", async () => {
     const dbWithSinglePool = new Kysely<TestDB>({
       dialect: new MysqlReplicaDialect({
