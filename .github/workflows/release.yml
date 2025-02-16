@@ -31,7 +31,7 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Create release PR
+      - name: Create release PR (or release)
         uses: changesets/action@v1
         with:
           publish: pnpm release
