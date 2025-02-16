@@ -1,5 +1,11 @@
 # kysely-mysql-replica
 
+## 0.2.0
+
+### Minor Changes
+
+- [`5287219`](https://github.com/robinellgren/kysely-mysql-replica/commit/5287219b8d79390c31d1b850d9eb7afcaeea95a7) Thanks [@robinellgren](https://github.com/robinellgren)! - Fix typescript build
+
 ## 0.1.0
 
 ### Minor Changes
