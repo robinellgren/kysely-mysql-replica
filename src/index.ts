@@ -53,7 +53,7 @@ class MysqlReplicaDriver implements Driver {
   async acquireConnection(): Promise<MysqlReplicaDBConnection> {
     const [readConnection, writeConnection] = await Promise.all([
       this.#mysqlReadDriver.acquireConnection(),
-      this.#mysqlWriteDriver!.acquireConnection(),
+      this.#mysqlWriteDriver.acquireConnection(),
     ]);
     const connectionId = crypto.randomUUID();
     return {
@@ -69,10 +69,10 @@ class MysqlReplicaDriver implements Driver {
         getConnectionId: () => connectionId,
         getWriteConnection: () => writeConnection,
         release: async () => {
-          await this.#mysqlWriteDriver!.releaseConnection(
+          await this.#mysqlWriteDriver.releaseConnection(
             writeConnection as MysqlConnection,
           );
-          await this.#mysqlReadDriver!.releaseConnection(
+          await this.#mysqlReadDriver.releaseConnection(
             readConnection as MysqlConnection,
           );
         },
@@ -87,29 +87,29 @@ class MysqlReplicaDriver implements Driver {
   ): Promise<void> {
     this.#transactions.add(connection.replicaConnection.getConnectionId());
     const writeConnection = connection.replicaConnection.getWriteConnection();
-    return this.#mysqlWriteDriver!.beginTransaction(writeConnection, settings);
+    return this.#mysqlWriteDriver.beginTransaction(writeConnection, settings);
   }
 
   commitTransaction(connection: MysqlReplicaDBConnection): Promise<void> {
     const writeConnection = connection.replicaConnection.getWriteConnection();
     this.#transactions.delete(connection.replicaConnection.getConnectionId());
-    return this.#mysqlWriteDriver!.commitTransaction(writeConnection);
+    return this.#mysqlWriteDriver.commitTransaction(writeConnection);
   }
 
   async destroy(): Promise<void> {
     // if the same pool is passed in config, we are essentially destroying it twice which will fail so we need to adjust for that.
     if (this.#config.pools?.read === this.#config.pools?.write) {
-      await this.#mysqlWriteDriver!.destroy();
+      await this.#mysqlWriteDriver.destroy();
       return;
     }
-    await this.#mysqlWriteDriver!.destroy();
-    await this.#mysqlReadDriver!.destroy();
+    await this.#mysqlWriteDriver.destroy();
+    await this.#mysqlReadDriver.destroy();
     return;
   }
 
   async init(): Promise<void> {
-    await this.#mysqlReadDriver!.init();
-    await this.#mysqlWriteDriver!.init();
+    await this.#mysqlReadDriver.init();
+    await this.#mysqlWriteDriver.init();
   }
 
   async releaseConnection(connection: MysqlReplicaDBConnection): Promise<void> {
@@ -119,7 +119,7 @@ class MysqlReplicaDriver implements Driver {
   rollbackTransaction(connection: MysqlReplicaDBConnection): Promise<void> {
     const writeConnection = connection.replicaConnection.getWriteConnection();
     this.#transactions.delete(connection.replicaConnection.getConnectionId());
-    return this.#mysqlWriteDriver!.rollbackTransaction(writeConnection);
+    return this.#mysqlWriteDriver.rollbackTransaction(writeConnection);
   }
 }
 
