@@ -1,5 +1,13 @@
 # kysely-mysql-replica
 
+## 0.3.1
+
+### Patch Changes
+
+- [`06378fb`](https://github.com/robinellgren/kysely-replica-dialect/commit/06378fb23185746942e2498cef6e32d95f2167c6) Thanks [@robinellgren](https://github.com/robinellgren)! - Remove unnecessary exclamation marks
+
+- [`b0fa7fe`](https://github.com/robinellgren/kysely-replica-dialect/commit/b0fa7fe5d78804f1c19a3911002f564d0d7ab0cc) Thanks [@robinellgren](https://github.com/robinellgren)! - Export PostgresReplicaDialect
+
 ## 0.3.0
 
 ### Minor Changes
