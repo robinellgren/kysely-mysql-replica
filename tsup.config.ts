@@ -7,5 +7,5 @@ export default defineConfig({
   minify: true,
   sourcemap: true,
   treeshake: true,
-  tsconfig: "./tsconfig.json"
+  tsconfig: "./tsconfig.json",
 });

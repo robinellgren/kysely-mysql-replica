@@ -1,7 +1,7 @@
-import { hello } from "."
+import { hello } from ".";
 
 describe("dummy test", () => {
-    it("should work", () => {
-        expect(hello()).toBe("hello");
-    })
-})
+  it("should work", () => {
+    expect(hello()).toBe("hello");
+  });
+});

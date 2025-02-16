@@ -28,7 +28,7 @@ type MysqlReplicaDialectConfig =
       pools: { read: MysqlPool; write: MysqlPool };
     });
 
-interface MysqlReplicaDialectConfigBase extends Omit<MysqlDialectConfig, "pool"> {}
+type MysqlReplicaDialectConfigBase = Omit<MysqlDialectConfig, "pool">;
 
 class MysqlReplicaDriver extends MysqlDriver implements Driver {
   #config: MysqlReplicaDialectConfig;
