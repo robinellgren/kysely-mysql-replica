@@ -1,15 +1,15 @@
 # kysely-mysql-replica
 A Kysely dialect for MySQL with support for replicas
 
-[![CI](https://github.com/robinellgren/kysely-mysql-replica/actions/workflows/release.yml/badge.svg)](https://github.com/robinellgren/kysely-mysql-replica/actions/workflows/ci.yml)
+[![CI](https://github.com/robinellgren/kysely-mysql-replica/actions/workflows/release.yml/badge.svg)](https://github.com/robinellgren/kysely-mysql-replica/actions/workflows/release.yml)
 [![npm](https://img.shields.io/npm/v/kysely-mysql-replica.svg)](https://www.npmjs.com/package/kysely-mysql-replica)
 
 A [Kysely](https://github.com/koskimas/kysely) dialect for [MySQL](https://www.mysql.com) that supports using **read replication**. The dialect uses the [Core MySQL Dialect](https://kysely-org.github.io/kysely-apidoc/classes/MysqlDialect.html) under the hood.
 
 ## Features
 
-- ⚡️&nbsp; Well-tested and production ready.
-- 🍃&nbsp; Light - The dialect has zero dependencies (other than `kysely` itself).
+- ⚡️&nbsp; Well-tested and production ready
+- 🍃&nbsp; Light - The dialect has zero dependencies (other than `kysely` itself)
 - ✅&nbsp; Easy to add to your existing project
 
 ## Read replication
