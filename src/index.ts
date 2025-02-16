@@ -1,11 +1,17 @@
 import {
   DatabaseConnection,
+  DatabaseIntrospector,
   Dialect,
+  DialectAdapter,
   Driver,
-  MysqlDialect,
+  Kysely,
+  MysqlAdapter,
   MysqlDialectConfig,
   MysqlDriver,
+  MysqlIntrospector,
   MysqlPool,
+  MysqlQueryCompiler,
+  QueryCompiler,
   SelectQueryNode,
   TransactionSettings,
 } from "kysely";
@@ -14,52 +20,40 @@ import {
 type MysqlConnection = Parameters<MysqlDriver["releaseConnection"]>[0];
 
 interface MysqlReplicaDBConnection extends DatabaseConnection {
-  replicaConnection?: {
+  replicaConnection: {
     getConnectionId: () => string;
     getWriteConnection: () => DatabaseConnection;
     release: () => Promise<void>;
   };
 }
 
-type MysqlReplicaDialectConfig =
-  | (MysqlReplicaDialectConfigBase & {
-      pool: (() => Promise<MysqlPool>) | MysqlPool;
-      pools?: never;
-    })
-  | (MysqlReplicaDialectConfigBase & {
-      pool?: never;
-      pools: { read: MysqlPool; write: MysqlPool };
-    });
+type MysqlReplicaDialectConfig = MysqlReplicaDialectConfigBase & {
+  pools: { read: Pool; write: Pool };
+};
 
 type MysqlReplicaDialectConfigBase = Omit<MysqlDialectConfig, "pool">;
 
-class MysqlReplicaDriver extends MysqlDriver implements Driver {
+type Pool = (() => Promise<MysqlPool>) | MysqlPool;
+
+class MysqlReplicaDriver implements Driver {
   #config: MysqlReplicaDialectConfig;
-  #mysqlReadDriver?: MysqlDriver;
-  #mysqlWriteDriver?: MysqlDriver;
+  #mysqlReadDriver: MysqlDriver;
+  #mysqlWriteDriver: MysqlDriver;
   #transactions: Set<string> = new Set();
 
   constructor(config: MysqlReplicaDialectConfig) {
-    super({ ...config, pool: config.pool ?? config.pools.write });
-
-    if (config.pools) {
-      const baseConfig = { ...config, pools: undefined };
-      this.#mysqlReadDriver = new MysqlDriver({
-        ...baseConfig,
-        pool: config.pools.read,
-      });
-      this.#mysqlWriteDriver = new MysqlDriver({
-        ...baseConfig,
-        pool: config.pools.write,
-      });
-    }
+    this.#mysqlReadDriver = new MysqlDriver({
+      ...config,
+      pool: config.pools.read,
+    });
+    this.#mysqlWriteDriver = new MysqlDriver({
+      ...config,
+      pool: config.pools.write,
+    });
     this.#config = config;
   }
 
-  override async acquireConnection(): Promise<MysqlReplicaDBConnection> {
-    if (!this.#mysqlReadDriver) {
-      return super.acquireConnection();
-    }
+  async acquireConnection(): Promise<MysqlReplicaDBConnection> {
     const [readConnection, writeConnection] = await Promise.all([
       this.#mysqlReadDriver.acquireConnection(),
       this.#mysqlWriteDriver!.acquireConnection(),
@@ -90,32 +84,22 @@ class MysqlReplicaDriver extends MysqlDriver implements Driver {
     };
   }
 
-  override beginTransaction(
+  beginTransaction(
     connection: MysqlReplicaDBConnection,
     settings: TransactionSettings,
   ): Promise<void> {
-    if (connection.replicaConnection) {
-      this.#transactions.add(connection.replicaConnection.getConnectionId());
-      const writeConnection = connection.replicaConnection.getWriteConnection();
-      return this.#mysqlWriteDriver!.beginTransaction(writeConnection, settings);
-    }
-    return super.beginTransaction(connection, settings);
+    this.#transactions.add(connection.replicaConnection.getConnectionId());
+    const writeConnection = connection.replicaConnection.getWriteConnection();
+    return this.#mysqlWriteDriver!.beginTransaction(writeConnection, settings);
   }
 
-  override commitTransaction(connection: MysqlReplicaDBConnection): Promise<void> {
-    if (connection.replicaConnection) {
-      const writeConnection = connection.replicaConnection.getWriteConnection();
-      this.#transactions.delete(connection.replicaConnection.getConnectionId());
-      return this.#mysqlWriteDriver!.commitTransaction(writeConnection);
-    }
-    return super.commitTransaction(connection);
+  commitTransaction(connection: MysqlReplicaDBConnection): Promise<void> {
+    const writeConnection = connection.replicaConnection.getWriteConnection();
+    this.#transactions.delete(connection.replicaConnection.getConnectionId());
+    return this.#mysqlWriteDriver!.commitTransaction(writeConnection);
   }
 
-  override async destroy(): Promise<void> {
-    if (!this.#mysqlReadDriver) {
-      await super.destroy();
-      return;
-    }
+  async destroy(): Promise<void> {
     // if the same pool is passed in config, we are essentially destroying it twice which will fail so we need to adjust for that.
     if (this.#config.pools?.read === this.#config.pools?.write) {
       await this.#mysqlWriteDriver!.destroy();
@@ -126,43 +110,38 @@ class MysqlReplicaDriver extends MysqlDriver implements Driver {
     return;
   }
 
-  override async init(): Promise<void> {
-    if (!this.#mysqlReadDriver) {
-      await super.init();
-      return;
-    }
+  async init(): Promise<void> {
     await this.#mysqlReadDriver!.init();
     await this.#mysqlWriteDriver!.init();
   }
 
-  override async releaseConnection(
-    connection: MysqlReplicaDBConnection,
-  ): Promise<void> {
-    if (connection.replicaConnection) {
-      await connection.replicaConnection.release();
-      return;
-    }
-    await super.releaseConnection(connection as MysqlConnection);
+  async releaseConnection(connection: MysqlReplicaDBConnection): Promise<void> {
+    await connection.replicaConnection.release();
   }
 
-  override rollbackTransaction(connection: MysqlReplicaDBConnection): Promise<void> {
-    if (connection.replicaConnection) {
-      const writeConnection = connection.replicaConnection.getWriteConnection();
-      this.#transactions.delete(connection.replicaConnection.getConnectionId());
-      return this.#mysqlWriteDriver!.rollbackTransaction(writeConnection);
-    }
-    return super.rollbackTransaction(connection);
+  rollbackTransaction(connection: MysqlReplicaDBConnection): Promise<void> {
+    const writeConnection = connection.replicaConnection.getWriteConnection();
+    this.#transactions.delete(connection.replicaConnection.getConnectionId());
+    return this.#mysqlWriteDriver!.rollbackTransaction(writeConnection);
   }
 }
 
-export class MysqlReplicaDialect extends MysqlDialect implements Dialect {
+export class MysqlReplicaDialect implements Dialect {
   #config: MysqlReplicaDialectConfig;
   constructor(config: MysqlReplicaDialectConfig) {
-    super({ ...config, pool: config.pool ?? config.pools.write });
     this.#config = config;
   }
-
-  override createDriver(): Driver {
+  createAdapter(): DialectAdapter {
+    return new MysqlAdapter();
+  }
+  createDriver(): Driver {
     return new MysqlReplicaDriver(this.#config as MysqlReplicaDialectConfig);
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  createIntrospector(db: Kysely<any>): DatabaseIntrospector {
+    return new MysqlIntrospector(db);
+  }
+  createQueryCompiler(): QueryCompiler {
+    return new MysqlQueryCompiler();
   }
 }
