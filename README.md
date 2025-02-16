@@ -10,6 +10,7 @@ A [Kysely](https://github.com/koskimas/kysely) dialect for [MySQL](https://www.m
 
 - ⚡️&nbsp; Well-tested and production ready
 - 🍃&nbsp; Light - The dialect has zero dependencies (other than `kysely` itself)
+- 🐘🐬&nbsp; Works with both `MySQL` and `Postgres`.
 - ✅&nbsp; Easy to add to your existing project
 
 ## Read replication
@@ -37,44 +38,89 @@ npm install kysely-mysql-replica
 ```
 
 ## Usage
-> Each `write` or `transaction` query will use the `write` pool. For `SELECT`, the `read` pool will be used. Read and write replicas within the pool are switched using a basic round robin scheduling (due to `mysql2` pool feature).
+> Each `write` or `transaction` query will use the `write` pool. For `SELECT`, the `read` pool will be used. Read and write replicas within the pool are switched using the underlying driver (`mysql2` or `pg`).
+
+Since this library uses `kysely` core drivers under the hood, the extra dialect config is passed to there. This means that functionality for use `onCreateConnection` and `onReserveConnection` stays the same.
+
+### MySQL
 
 You can pass a new instance of `MysqlReplicaDialect` as the `dialect` option when creating a new `Kysely` instance:
 
 ```typescript
-import { Kysely } from 'kysely';
-import { createPool } from 'mysql2';
-import { MysqlReplicaDialect } from 'kysely-mysql-replica';
+import { Kysely } from "kysely";
+import { createPool } from "mysql2";
+import { MysqlReplicaDialect } from "kysely-mysql-replica";
 
 const writePool = createPool({
-    database: 'some_db',
-    host: 'localhost:3306',
+    database: "some_db",
+    host: "localhost:3306",
 });
 
 const readPool = createPool({
-    database: 'some_db',
-    host: 'localhost:3307',
+    database: "some_db",
+    host: "localhost:3307",
 });
 
-const db = new Kysely<TestDB>({
+const db = new Kysely<DB>({
   dialect: new MysqlReplicaDialect({
     pools: {
       read: readPool,
       write: writePool,
     },
+    ...yourOtherDialectConfig,
   }),
 });
 ```
 
+### Postgres
+
+Similarily to Mysql, you can pass a new instance of `PostgresReplicaDialect` as the `dialect` option when creating a new `Kysely` instance:
+
+```typescript
+import { Kysely } from "kysely";
+import { Pool } from "pg";
+import { PostgresReplicaDialect } from "kysely-mysql-replica";
+
+const writePool = Pool({
+    database: "some_db",
+    host: "localhost:3306",
+});
+
+const readPool = Pool({
+    database: "some_db",
+    host: "localhost:3307",
+});
+
+const db = new Kysely<TestDB>({
+  dialect: new PostgresReplicaDialect({
+    pools: {
+      read: readPool,
+      write: writePool,
+    },
+    ...yourOtherDialectConfig,
+  }),
+});
+```
+
+### Pool as function
+
 If you want the pool to only be created once it's first used, pool can be a function (just like in `kysely`):
 
 ```typescript
-import { createPool } from 'mysql2'
+import { createPool } from "mysql2";
+import { Pool } from "pg";
 
 new MysqlReplicaDialect({
     pools: {
       read: async () => createPool({ database: "some_db", host: "localhost:3307" }),
       write: async () => createPool({ database: "some_db", host: "localhost:3306" }),
+    },
+});
+
+new PostgresReplicaDialect({
+    pools: {
+      read: async () => Pool({ database: "some_db", host: "localhost:3307" }),
+      write: async () => Pool({ database: "some_db", host: "localhost:3306" }),
     },
 });
 ```

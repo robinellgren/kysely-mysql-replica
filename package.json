@@ -2,13 +2,15 @@
   "name": "kysely-mysql-replica",
   "author": "robinellgren",
   "version": "0.3.0",
-  "description": "Kysely dialect for MySQL with support for replicas",
+  "description": "Kysely dialect for MySQL and Postgres with support for replicas",
   "license": "MIT",
   "keywords": [
     "kysely",
     "replica",
     "typescript",
     "mysql",
+    "postgres",
+    "pg",
     "dialect"
   ],
   "main": "dist/index.js",
