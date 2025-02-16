@@ -1,0 +1,61 @@
+{
+    "name": "tsynamo",
+    "author": "robinellgren",
+    "version": "0.0.1",
+    "description": "Kysely dialect for MySQL with support for replicas",
+    "license": "MIT",
+    "keywords": [
+        "kysely",
+        "replica",
+        "typescript",
+        "mysql",
+        "dialect"
+    ],
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "module": "dist/index.mjs",
+    "exports": {
+        "import": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        },
+        "require": {
+            "types": "./dist/index.d.cts",
+            "require": "./dist/index.cjs"
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "tsup ./src/index.ts",
+        "tsc": "tsc",
+        "test": "vitest --typecheck --watch false"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/robinellgren/kysely-mysql-replica.git"
+    },
+    "bugs": {
+        "url": "https://github.com/robinellgren/kysely-mysql-replica/issues"
+    },
+    "devDependencies": {
+        "@tsconfig/node20": "^20.0.0",
+        "@types/node": "^20.14.8",
+        "testcontainers": "^10.18.0",
+        "tsup": "^8.3.6",
+        "typescript": "^5.7.3",
+        "vitest": "^3.0.5"
+    },
+    "peerDependencies": {
+        "kysely": "^0.27.5"
+    },
+    "engines": {
+        "node": ">=20"
+    },
+    "packageManager": "pnpm@10.4.0",
+    "volta": {
+        "pnpm": "10.4.0",
+        "node": "20.18.3"
+    }
+}
