@@ -1,4 +1,4 @@
-import { MySqlContainer } from "@testcontainers/mysql";
+import { MySqlContainer, StartedMySqlContainer } from "@testcontainers/mysql";
 import { Generated, Kysely, MysqlDialect } from "kysely";
 import { createPool } from "mysql2";
 import { afterAll, describe, expect, it } from "vitest";
@@ -30,15 +30,17 @@ describe.sequential("mysql replica dialect", async () => {
       .execute();
   };
 
-  const getContainerWithPoolAndDb = async () => {
-    const container = await new MySqlContainer().start();
-    const pool = createPool({
+  const getPool = (container: StartedMySqlContainer) =>
+    createPool({
       database: container.getDatabase(),
       host: container.getHost(),
       password: container.getUserPassword(),
       port: container.getPort(),
       user: container.getUsername(),
     });
+  const getContainerWithPoolAndDb = async () => {
+    const container = await new MySqlContainer().start();
+    const pool = getPool(container);
     const db = new Kysely<TestDB>({
       dialect: new MysqlDialect({
         pool,
@@ -48,28 +50,28 @@ describe.sequential("mysql replica dialect", async () => {
   };
 
   const {
-    container: emptyContainer,
-    db: emptyDb,
-    pool: poolWithEmptyDb,
+    container: readContainer,
+    db: readDb,
+    pool: readPool,
   } = await getContainerWithPoolAndDb();
-  await setupSchema(emptyDb);
+  await setupSchema(readDb);
   const {
-    container: filledContainer,
-    db: stuffDb,
-    pool: poolWithRows,
+    container: writeContainer,
+    db: writeDb,
+    pool: writePool,
   } = await getContainerWithPoolAndDb();
-  await setupSchema(stuffDb);
+  await setupSchema(writeDb);
   // So write and read pool are now actually different DBs!
   const pools = {
-    read: poolWithEmptyDb,
-    write: poolWithRows,
+    read: readPool,
+    write: writePool,
   };
   const dbClient = new Kysely<TestDB>({
     dialect: new MysqlReplicaDialect({ pools }),
   });
   afterAll(async () => {
-    await emptyContainer.stop();
-    await filledContainer.stop();
+    await readContainer.stop();
+    await writeContainer.stop();
   });
 
   it("should be able switch seamlessly between read and write pool", async () => {
@@ -114,7 +116,7 @@ describe.sequential("mysql replica dialect", async () => {
   it("should work when write and read is the same pool ", async () => {
     const dbWithSinglePool = new Kysely<TestDB>({
       dialect: new MysqlReplicaDialect({
-        pools: { read: poolWithRows, write: poolWithRows },
+        pools: { read: writePool, write: writePool },
       }),
     });
     // insert first
@@ -159,7 +161,7 @@ describe.sequential("mysql replica dialect", async () => {
   });
 
   it("should always use writer when streaming inside transaction", async () => {
-    dbClient.transaction().execute(async (trx) => {
+    await dbClient.transaction().execute(async (trx) => {
       const stream = trx // write db being used
         .insertInto("Users")
         .values([
@@ -185,5 +187,62 @@ describe.sequential("mysql replica dialect", async () => {
       // since we are now inside a transaction, we will use write db, meaning all created users will be returned
       expect(readUserIds).toEqual([105, 106]);
     });
+  });
+
+  it("should rollback transactions when error is thrown", async () => {
+    await dbClient
+      .transaction()
+      .execute(async (trx) => {
+        await trx
+          .insertInto("Users")
+          .values([{ firstName: "Luke Skywalker", id: 200 }])
+          .execute();
+        const userRow = await trx
+          .selectFrom("Users")
+          .selectAll()
+          .where("id", "=", 200)
+          .executeTakeFirstOrThrow();
+        expect(userRow.firstName).toEqual("Luke Skywalker");
+        throw new Error("Transaction error");
+      })
+      .catch((e: Error) => expect(e.message).toEqual("Transaction error"));
+    // since transaction was used => writeDb. So this query should get result if error not thrown
+    const userRow = await writeDb
+      .selectFrom("Users")
+      .selectAll()
+      .where("id", "=", 200)
+      .executeTakeFirst();
+    expect(userRow).toBe(undefined);
+  });
+
+  it("will not destroy the same pool twice if same pool is used as arguments", async () => {
+    await dbClient.destroy();
+    const writeDbPromise = writeDb
+      .selectFrom("Users")
+      .selectAll()
+      .where("id", "=", 200)
+      .executeTakeFirst();
+    await expect(writeDbPromise).rejects.toThrowErrorMatchingInlineSnapshot(
+      "[Error: Pool is closed.]",
+    );
+    const readDbPromise = readDb
+      .selectFrom("Users")
+      .selectAll()
+      .where("id", "=", 200)
+      .executeTakeFirst();
+    await expect(readDbPromise).rejects.toThrowErrorMatchingInlineSnapshot(
+      "[Error: Pool is closed.]",
+    );
+  });
+
+  it("will not destroy the same pool twice if same pool is used as arguments", async () => {
+    const newWritePool = getPool(writeContainer);
+    const newClient = new Kysely<TestDB>({
+      dialect: new MysqlReplicaDialect({
+        pools: { read: newWritePool, write: newWritePool },
+      }),
+    });
+    const destroyResult = await newClient.destroy();
+    expect(destroyResult).toBe(undefined); // i.e. "did not throw"
   });
 });
