@@ -77,7 +77,15 @@ export class ReplicaDriver implements Driver {
           await this.#readDriver.releaseConnection(readConnection);
         },
       },
-      streamQuery: (...args) => readConnection.streamQuery(...args), // Streaming is always done via read
+      streamQuery: (...args) => {
+        if (this.#transactions.has(connectionId)) {
+          return writeConnection.streamQuery(...args);
+        }
+        const [compiledQuery] = args;
+        return SelectQueryNode.is(compiledQuery.query)
+          ? readConnection.streamQuery(...args)
+          : writeConnection.streamQuery(...args);
+      },
     };
   }
 

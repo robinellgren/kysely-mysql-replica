@@ -130,4 +130,60 @@ describe.sequential("mysql replica dialect", async () => {
       .executeTakeFirst();
     expect(robinsPet?.ownerId).toBe(2);
   });
+
+  it("should work to switch between reader and writer when streaming", async () => {
+    const stream = dbClient // write db being used
+      .insertInto("Users")
+      .values([
+        { firstName: "Yoda", id: 100 },
+        { firstName: "Obi-Wan Kenobi", id: 101 },
+      ])
+      .stream();
+    const userIds: number[] = [];
+    for await (const result of stream) {
+      userIds.push(Number(result.insertId));
+    }
+    // MySQL only returns the last created id
+    expect(userIds).toEqual([101]);
+    const readStream = dbClient
+      .selectFrom("Users")
+      .selectAll()
+      .where("firstName", "in", ["Yoda", "Obi-Wan Kenobi"])
+      .stream();
+    const readUserIds: number[] = [];
+    for await (const user of readStream) {
+      readUserIds.push(user.id);
+    }
+    // since we are now using read db, no results will be given
+    expect(readUserIds.length).toEqual(0);
+  });
+
+  it("should always use writer when streaming inside transaction", async () => {
+    dbClient.transaction().execute(async (trx) => {
+      const stream = trx // write db being used
+        .insertInto("Users")
+        .values([
+          { firstName: "Yoda-Trx", id: 105 },
+          { firstName: "Obi-Wan Kenobi-Trx", id: 106 },
+        ])
+        .stream();
+      const userIds: number[] = [];
+      for await (const result of stream) {
+        userIds.push(Number(result.insertId));
+      }
+      // MySQL only returns the last created id
+      expect(userIds).toEqual([106]);
+      const readStream = trx
+        .selectFrom("Users")
+        .selectAll()
+        .where("firstName", "in", ["Yoda-Trx", "Obi-Wan Kenobi-Trx"])
+        .stream();
+      const readUserIds: number[] = [];
+      for await (const user of readStream) {
+        readUserIds.push(user.id);
+      }
+      // since we are now inside a transaction, we will use write db, meaning all created users will be returned
+      expect(readUserIds).toEqual([105, 106]);
+    });
+  });
 });
