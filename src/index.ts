@@ -1,8 +1,6 @@
 import {
   DatabaseConnection,
-  DatabaseIntrospector,
   Dialect,
-  DialectAdapter,
   Driver,
   Kysely,
   MysqlAdapter,
@@ -11,7 +9,6 @@ import {
   MysqlIntrospector,
   MysqlPool,
   MysqlQueryCompiler,
-  QueryCompiler,
   SelectQueryNode,
   TransactionSettings,
 } from "kysely";
@@ -131,17 +128,17 @@ export class MysqlReplicaDialect implements Dialect {
   constructor(config: MysqlReplicaDialectConfig) {
     this.#config = config;
   }
-  createAdapter(): DialectAdapter {
+  createAdapter() {
     return new MysqlAdapter();
   }
-  createDriver(): Driver {
-    return new MysqlReplicaDriver(this.#config as MysqlReplicaDialectConfig);
+  createDriver() {
+    return new MysqlReplicaDriver(this.#config);
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  createIntrospector(db: Kysely<any>): DatabaseIntrospector {
+  createIntrospector(db: Kysely<any>) {
     return new MysqlIntrospector(db);
   }
-  createQueryCompiler(): QueryCompiler {
+  createQueryCompiler() {
     return new MysqlQueryCompiler();
   }
 }
