@@ -1,5 +1,5 @@
 {
-  "name": "kysely-mysql-replica",
+  "name": "kysely-replica-dialect",
   "author": "robinellgren",
   "version": "0.3.0",
   "description": "Kysely dialect for MySQL and Postgres with support for replicas",
@@ -38,10 +38,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/robinellgren/kysely-mysql-replica.git"
+    "url": "git+https://github.com/robinellgren/kysely-replica-dialect.git"
   },
   "bugs": {
-    "url": "https://github.com/robinellgren/kysely-mysql-replica/issues"
+    "url": "https://github.com/robinellgren/kysely-replica-dialect/issues"
   },
   "devDependencies": {
     "@eslint/js": "^9.20.0",

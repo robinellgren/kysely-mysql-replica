@@ -1,8 +1,8 @@
-# kysely-mysql-replica
-A Kysely dialect for MySQL with support for replicas
+# kysely-replica-dialect
+A Kysely dialect for MySQL and Postgres with support for replicas
 
-[![CI](https://github.com/robinellgren/kysely-mysql-replica/actions/workflows/release.yml/badge.svg)](https://github.com/robinellgren/kysely-mysql-replica/actions/workflows/release.yml)
-[![npm](https://img.shields.io/npm/v/kysely-mysql-replica.svg)](https://www.npmjs.com/package/kysely-mysql-replica)
+[![CI](https://github.com/robinellgrenkysely-replica-dialect/actions/workflows/release.yml/badge.svg)](https://github.com/robinellgren/kysely-replica-dialect/actions/workflows/release.yml)
+[![npm](https://img.shields.io/npm/v/kysely-replica-dialect.svg)](https://www.npmjs.com/package/kysely-replica-dialect)
 
 A [Kysely](https://github.com/koskimas/kysely) dialect for [MySQL](https://www.mysql.com) that supports using **read replication**. The dialect uses the [Core MySQL Dialect](https://kysely-org.github.io/kysely-apidoc/classes/MysqlDialect.html) under the hood.
 
@@ -17,24 +17,24 @@ A [Kysely](https://github.com/koskimas/kysely) dialect for [MySQL](https://www.m
 
 Read replication allows distributing SELECT queries across multiple read replicas while directing all writes and updates to a primary database instance. This can improve read performance and scalability.
 
-`kysely-mysql-replica` adds support for MySQL read replication in Kysely, which [is not available in the main library](https://github.com/kysely-org/kysely/issues/450). You define a primary database for writes and one or more read replicas for queries. Note that `kysely-mysql-replica` does not handle the actual replication setup. That is managed by the database itself.
+`kysely-replica-dialect` adds support for MySQL read replication in Kysely, which [is not available in the main library](https://github.com/kysely-org/kysely/issues/450). You define a primary database for writes and one or more read replicas for queries. Note that `kysely-replica-dialect` does not handle the actual replication setup. That is managed by the database itself.
 
 ## Installation
 
-Available in [NPM](https://www.npmjs.com/package/kysely-mysql-replica).
+Available in [NPM](https://www.npmjs.com/package/kysely-replica-dialect).
 
 The only required peer-dependency is `kysely`.
 You can install the library with your favorite package manager:
 
 ```bash
 # with pnpm
-pnpm add kysely-mysql-replica
+pnpm add kysely-replica-dialect
 
 # with yarn
-yarn add kysely-mysql-replica
+yarn add kysely-replica-dialect
 
 # with npm
-npm install kysely-mysql-replica
+npm install kysely-replica-dialect
 ```
 
 ## Usage
@@ -49,7 +49,7 @@ You can pass a new instance of `MysqlReplicaDialect` as the `dialect` option whe
 ```typescript
 import { Kysely } from "kysely";
 import { createPool } from "mysql2";
-import { MysqlReplicaDialect } from "kysely-mysql-replica";
+import { MysqlReplicaDialect } from "kysely-replica-dialect";
 
 const writePool = createPool({
     database: "some_db",
@@ -79,7 +79,7 @@ Similarily to Mysql, you can pass a new instance of `PostgresReplicaDialect` as 
 ```typescript
 import { Kysely } from "kysely";
 import { Pool } from "pg";
-import { PostgresReplicaDialect } from "kysely-mysql-replica";
+import { PostgresReplicaDialect } from "kysely-replica-dialect";
 
 const writePool = Pool({
     database: "some_db",
