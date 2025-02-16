@@ -10,6 +10,9 @@ import {
   TransactionSettings,
 } from "kysely";
 
+// Unfortunately, Kysely does not export the class needed for release connection. So we need to extract it so we cast to it later :/
+type MysqlConnection = Parameters<MysqlDriver["releaseConnection"]>[0];
+
 interface MysqlReplicaDBConnection extends DatabaseConnection {
   replicaConnection?: {
     getConnectionId: () => string;
@@ -75,13 +78,12 @@ class MysqlReplicaDriver extends MysqlDriver implements Driver {
         getConnectionId: () => connectionId,
         getWriteConnection: () => writeConnection,
         release: async () => {
-          // Unfortunately, Kysely does not export the class needed for release connection. So we need to cast as any :(
           await this.#mysqlWriteDriver!.releaseConnection(
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            writeConnection as any,
+            writeConnection as MysqlConnection,
           );
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await this.#mysqlReadDriver!.releaseConnection(readConnection as any);
+          await this.#mysqlReadDriver!.releaseConnection(
+            readConnection as MysqlConnection,
+          );
         },
       },
       streamQuery: (...args) => readConnection.streamQuery(...args), // Streaming is always done via read
@@ -114,7 +116,7 @@ class MysqlReplicaDriver extends MysqlDriver implements Driver {
       await super.destroy();
       return;
     }
-    // if the same pool is passed in config, we are essentially destroying it twice which fails so need to adjust for that.
+    // if the same pool is passed in config, we are essentially destroying it twice which will fail so we need to adjust for that.
     if (this.#config.pools?.read === this.#config.pools?.write) {
       await this.#mysqlWriteDriver!.destroy();
       return;
@@ -140,8 +142,7 @@ class MysqlReplicaDriver extends MysqlDriver implements Driver {
       await connection.replicaConnection.release();
       return;
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await super.releaseConnection(connection as any);
+    await super.releaseConnection(connection as MysqlConnection);
   }
 
   override rollbackTransaction(connection: MysqlReplicaDBConnection): Promise<void> {
