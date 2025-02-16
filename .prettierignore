@@ -3,3 +3,4 @@ node_modules/
 .git/
 pnpm-lock.yaml
 README.md
+coverage/
