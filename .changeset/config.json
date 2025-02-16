@@ -3,7 +3,7 @@
   "changelog": [
     "@changesets/changelog-github",
     {
-      "repo": "robinellgren/kysely-mysql-replica"
+      "repo": "robinellgren/kysely-replica-dialect"
     }
   ],
   "commit": true,

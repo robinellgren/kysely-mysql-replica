@@ -1,4 +1,4 @@
-# kysely-mysql-replica
+# kysely-replica-dialect
 
 ## 0.3.0
 
