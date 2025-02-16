@@ -4,7 +4,7 @@ A Kysely dialect for MySQL and Postgres with support for replicas
 [![CI](https://github.com/robinellgren/kysely-replica-dialect/actions/workflows/release.yml/badge.svg)](https://github.com/robinellgren/kysely-replica-dialect/actions/workflows/release.yml)
 [![npm](https://img.shields.io/npm/v/kysely-replica-dialect.svg)](https://www.npmjs.com/package/kysely-replica-dialect)
 
-A [Kysely](https://github.com/koskimas/kysely) dialect for [MySQL](https://www.mysql.com) that supports using **read replication**. The dialect uses the [Core MySQL Dialect](https://kysely-org.github.io/kysely-apidoc/classes/MysqlDialect.html) under the hood.
+A [Kysely](https://github.com/koskimas/kysely) dialect for `MySQL` and `Postgres` that supports using **read replication**. The dialect uses the respective core `kysely` dialects under the hood.
 
 ## Features
 
