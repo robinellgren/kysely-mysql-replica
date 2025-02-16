@@ -1,7 +1,7 @@
 {
   "name": "kysely-replica-dialect",
   "author": "robinellgren",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "Kysely dialect for MySQL and Postgres with support for replicas",
   "license": "MIT",
   "keywords": [
