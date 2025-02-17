@@ -1,5 +1,11 @@
 # kysely-replica-dialect
 
+## 0.1.2
+
+### Patch Changes
+
+- [`0766c27`](https://github.com/robinellgren/kysely-replica-dialect/commit/0766c27bfde3bb05d64c5bf863df8737a91551a4) Thanks [@robinellgren](https://github.com/robinellgren)! - Improve documentation and visualize 100% test coverage
+
 ## 0.1.1
 
 ### Patch Changes
