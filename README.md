@@ -1,35 +1,37 @@
 <div align="center">
   <h1>kysely-replica-dialect</h1>
-  <h3>A Kysely dialect for MySQL and Postgres with support for replicas</h3>
+  <a href="https://codecov.io/gh/robinellgren/kysely-replica-dialect" >
+    <img src="https://codecov.io/gh/robinellgren/kysely-replica-dialect/branch/main/graph/badge.svg?token=655MHJWNHP"/>
+  </a>
   <a href="https://www.npmcharts.com/compare/kysely-replica-dialect?interval=7">
     <img alt="weekly downloads" src="https://img.shields.io/npm/dw/kysely-replica-dialect">
+  </a>
+  <a href="https://www.npmjs.com/package/kysely-replica-dialect">
+    <img alt="NPM Badge" src="https://img.shields.io/npm/v/kysely-replica-dialect.svg" />
+  </a>
+  <a href="https://github.com/robinellgren/kysely-replica-dialect/actions/workflows/release.yml">
+    <img alt="Release Badge" src="https://github.com/robinellgren/kysely-replica-dialect/actions/workflows/release.yml/badge.svg" />
   </a>
   <a href="https://github.com/robinellgren/kysely-replica-dialect/blob/main/LICENSE">
     <img alt="MIT License" src="https://img.shields.io/github/license/robinellgren/kysely-replica-dialect" />
   </a>
 </div>
 
-
-# kysely-replica-dialect
-A Kysely dialect for MySQL and Postgres with support for replicas
-
-[![CI](https://github.com/robinellgren/kysely-replica-dialect/actions/workflows/release.yml/badge.svg)](https://github.com/robinellgren/kysely-replica-dialect/actions/workflows/release.yml)
-[![npm](https://img.shields.io/npm/v/kysely-replica-dialect.svg)](https://www.npmjs.com/package/kysely-replica-dialect)
-
 A [Kysely](https://github.com/koskimas/kysely) dialect for `MySQL` and `Postgres` that supports using **read replication**. The dialect uses the respective core `kysely` dialects under the hood.
 
 ## Features
 
 - ⚡️&nbsp; Well-tested and production ready
-- 🍃&nbsp; Light - The dialect has zero dependencies (other than `kysely` itself)
-- 🐘🐬&nbsp; Works with both `MySQL` and `Postgres`.
+- 💯&nbsp; 100% test coverage
+- 🍃&nbsp; Light - The library has zero dependencies (other than `kysely` itself)
+- 🐘🐬&nbsp; Works with both `MySQL` and `Postgres`
 - ✅&nbsp; Easy to add to your existing project
 
 ## Read replication
 
-Read replication allows distributing SELECT queries across multiple read replicas while directing all writes and updates to a primary database instance. This can improve read performance and scalability.
+Read replication allows distributing `SELECT` queries across multiple read replicas while directing all writes and updates to a primary database instance. This can improve read performance and scalability.
 
-`kysely-replica-dialect` adds support for MySQL read replication in Kysely, which [is not available in the main library](https://github.com/kysely-org/kysely/issues/450). You define a primary database for writes and one or more read replicas for queries. Note that `kysely-replica-dialect` does not handle the actual replication setup. That is managed by the database itself.
+`kysely-replica-dialect` adds support for `MySQL` and `Postgres` read replication in Kysely, which [is not available in the main library](https://github.com/kysely-org/kysely/issues/450). You define a primary database for writes and one or more read replicas for queries. Note that `kysely-replica-dialect` does not handle the actual replication setup. That is managed by the database itself.
 
 ## Installation
 
