@@ -105,8 +105,10 @@ export class ReplicaDriver implements Driver {
   }
 
   async destroy(): Promise<void> {
+    console.log("CALLED THE THINGY!!");
     // if the same pool is passed in config, we are essentially destroying it twice which will fail so we need to adjust for that.
-    if (this.#config.pools?.read === this.#config.pools?.write) {
+    if (this.#config.pools.read === this.#config.pools.write) {
+      console.log("SAME POOL!!!");
       await this.#writeDriver.destroy();
       return;
     }

@@ -215,7 +215,7 @@ describe.sequential("mysql replica dialect", async () => {
     expect(userRow).toBe(undefined);
   });
 
-  it("will not destroy the same pool twice if same pool is used as arguments", async () => {
+  it("can sucessfully destroy the pool resources", async () => {
     await dbClient.destroy();
     const writeDbPromise = writeDb
       .selectFrom("Users")
@@ -244,5 +244,9 @@ describe.sequential("mysql replica dialect", async () => {
     });
     const destroyResult = await newClient.destroy();
     expect(destroyResult).toBe(undefined); // i.e. "did not throw"
+    const promise = newClient.selectFrom("Users").selectAll().execute();
+    await expect(promise).rejects.toThrowErrorMatchingInlineSnapshot(
+      "[Error: Pool is closed.]",
+    );
   });
 });
