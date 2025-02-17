@@ -23,6 +23,9 @@ importers:
       '@testcontainers/mysql':
         specifier: ^10.18.0
         version: 10.18.0
+      '@testcontainers/postgresql':
+        specifier: 10.18.0
+        version: 10.18.0
       '@tsconfig/node20':
         specifier: ^20.0.0
         version: 20.1.4
@@ -35,6 +38,9 @@ importers:
       '@types/pg':
         specifier: 8.11.11
         version: 8.11.11
+      '@types/pg-cursor':
+        specifier: 2.7.2
+        version: 2.7.2
       '@vitest/coverage-v8':
         specifier: 3.0.5
         version: 3.0.5(vitest@3.0.5(@types/node@20.17.19)(jiti@2.4.2)(yaml@2.7.0))
@@ -59,6 +65,9 @@ importers:
       pg:
         specifier: 8.13.3
         version: 8.13.3
+      pg-cursor:
+        specifier: 2.12.3
+        version: 2.12.3(pg@8.13.3)
       prettier:
         specifier: ^3.3.2
         version: 3.5.1
@@ -548,6 +557,9 @@ packages:
   '@testcontainers/mysql@10.18.0':
     resolution: {integrity: sha512-btR1f1T3stQi6rrrivoG7cZTkVEC8rml6RWG91ExJYtLJNezPNeHFLwbZDqKfvA4ASw+2LUX5dZ4XISpHhiuAg==}
 
+  '@testcontainers/postgresql@10.18.0':
+    resolution: {integrity: sha512-WxkE/tBlBpoKvqDEqL3i/mL6BOBWnXb8FXKtLhEeZ3lSt0zlldkTozMmewNsKJtFTBZdv7uFwMzWyXP12t0sxQ==}
+
   '@tsconfig/node20@20.1.4':
     resolution: {integrity: sha512-sqgsT69YFeLWf5NtJ4Xq/xAF8p4ZQHlmGW74Nu2tD4+g5fAsposc4ZfaaPixVu4y01BEiDCWLRDCvDM5JOsRxg==}
 
@@ -574,6 +586,9 @@ packages:
 
   '@types/node@20.17.19':
     resolution: {integrity: sha512-LEwC7o1ifqg/6r2gn9Dns0f1rhK+fPFDoMiceTJ6kWmVk6bgXBI/9IOWfVan4WiAavK9pIVWdX0/e3J+eEUh5A==}
+
+  '@types/pg-cursor@2.7.2':
+    resolution: {integrity: sha512-m3xT8bVFCvx98LuzbvXyuCdT/Hjdd/v8ml4jL4K1QF70Y8clOfCFdgoaEB1FWdcSwcpoFYZTJQaMD9/GQ27efQ==}
 
   '@types/pg@8.11.11':
     resolution: {integrity: sha512-kGT1qKM8wJQ5qlawUrEkXgvMSXoV213KfMGXcwfDwUIfUHXqXYXOfS1nE1LINRJVVVx5wCm70XnFlMHaIcQAfw==}
@@ -1593,6 +1608,11 @@ packages:
 
   pg-connection-string@2.7.0:
     resolution: {integrity: sha512-PI2W9mv53rXJQEOb8xNR8lH7Hr+EKa6oJa38zsK0S/ky2er16ios1wLKhZyxzD7jUReiWokc9WK5nxSnC7W1TA==}
+
+  pg-cursor@2.12.3:
+    resolution: {integrity: sha512-2koS4+f+oCJnJ6pTdUlp3TkwOCjlPr9lmwcTDPeXZv3eiXDCxZeBC7T0+LldA9+mhqdcO8WDqbuFfdFEJm9YLw==}
+    peerDependencies:
+      pg: ^8
 
   pg-int8@1.0.1:
     resolution: {integrity: sha512-WCtabS6t3c8SkpDBUlb1kjOs7l66xsGdKpIPZsg4wR+B3+u9UAum2odSsF9tnvxg80h4ZxLWMy4pRjOsFIqQpw==}
@@ -2692,6 +2712,13 @@ snapshots:
       - bare-buffer
       - supports-color
 
+  '@testcontainers/postgresql@10.18.0':
+    dependencies:
+      testcontainers: 10.18.0
+    transitivePeerDependencies:
+      - bare-buffer
+      - supports-color
+
   '@tsconfig/node20@20.1.4': {}
 
   '@types/docker-modem@3.0.6':
@@ -2720,6 +2747,11 @@ snapshots:
   '@types/node@20.17.19':
     dependencies:
       undici-types: 6.19.8
+
+  '@types/pg-cursor@2.7.2':
+    dependencies:
+      '@types/node': 20.17.19
+      '@types/pg': 8.11.11
 
   '@types/pg@8.11.11':
     dependencies:
@@ -3770,6 +3802,10 @@ snapshots:
     optional: true
 
   pg-connection-string@2.7.0: {}
+
+  pg-cursor@2.12.3(pg@8.13.3):
+    dependencies:
+      pg: 8.13.3
 
   pg-int8@1.0.1: {}
 

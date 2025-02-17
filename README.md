@@ -1,3 +1,15 @@
+<div align="center">
+  <h1>kysely-replica-dialect</h1>
+  <h3>A Kysely dialect for MySQL and Postgres with support for replicas</h3>
+  <a href="https://www.npmcharts.com/compare/kysely-replica-dialect?interval=7">
+    <img alt="weekly downloads" src="https://img.shields.io/npm/dw/kysely-replica-dialect">
+  </a>
+  <a href="https://github.com/robinellgren/kysely-replica-dialect/blob/main/LICENSE">
+    <img alt="MIT License" src="https://img.shields.io/github/license/robinellgren/kysely-replica-dialect" />
+  </a>
+</div>
+
+
 # kysely-replica-dialect
 A Kysely dialect for MySQL and Postgres with support for replicas
 
