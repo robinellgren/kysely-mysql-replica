@@ -81,12 +81,12 @@ import { Kysely } from "kysely";
 import { Pool } from "pg";
 import { PostgresReplicaDialect } from "kysely-replica-dialect";
 
-const writePool = Pool({
+const writePool = new Pool({
     database: "some_db",
     host: "localhost:3306",
 });
 
-const readPool = Pool({
+const readPool = new Pool({
     database: "some_db",
     host: "localhost:3307",
 });
@@ -119,8 +119,8 @@ new MysqlReplicaDialect({
 
 new PostgresReplicaDialect({
     pools: {
-      read: async () => Pool({ database: "some_db", host: "localhost:3307" }),
-      write: async () => Pool({ database: "some_db", host: "localhost:3306" }),
+      read: async () => new Pool({ database: "some_db", host: "localhost:3307" }),
+      write: async () => new Pool({ database: "some_db", host: "localhost:3306" }),
     },
 });
 ```

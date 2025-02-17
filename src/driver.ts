@@ -104,11 +104,9 @@ export class ReplicaDriver implements Driver {
     return this.#writeDriver.commitTransaction(writeConnection);
   }
 
-  async destroy(): Promise<void> {
-    console.log("CALLED THE THINGY!!");
+  async destroy() {
     // if the same pool is passed in config, we are essentially destroying it twice which will fail so we need to adjust for that.
     if (this.#config.pools.read === this.#config.pools.write) {
-      console.log("SAME POOL!!!");
       await this.#writeDriver.destroy();
       return;
     }
@@ -117,16 +115,16 @@ export class ReplicaDriver implements Driver {
     return;
   }
 
-  async init(): Promise<void> {
+  async init() {
     await this.#readDriver.init();
     await this.#writeDriver.init();
   }
 
-  async releaseConnection(connection: ReplicaDatabaseConnection): Promise<void> {
+  async releaseConnection(connection: ReplicaDatabaseConnection) {
     await connection.replicaConnection.release();
   }
 
-  rollbackTransaction(connection: ReplicaDatabaseConnection): Promise<void> {
+  rollbackTransaction(connection: ReplicaDatabaseConnection) {
     const writeConnection = connection.replicaConnection.getWriteConnection();
     this.#transactions.delete(connection.replicaConnection.getConnectionId());
     return this.#writeDriver.rollbackTransaction(writeConnection);

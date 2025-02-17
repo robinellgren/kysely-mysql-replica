@@ -114,9 +114,10 @@ describe.sequential("mysql replica dialect", async () => {
   });
 
   it("should work when write and read is the same pool ", async () => {
+    const newPool = getPool(writeContainer);
     const dbWithSinglePool = new Kysely<TestDB>({
       dialect: new MysqlReplicaDialect({
-        pools: { read: writePool, write: writePool },
+        pools: { read: newPool, write: newPool },
       }),
     });
     // insert first
@@ -131,6 +132,18 @@ describe.sequential("mysql replica dialect", async () => {
       .where("firstName", "=", "Lassie")
       .executeTakeFirst();
     expect(robinsPet?.ownerId).toBe(2);
+    const destroyResult = await dbWithSinglePool.destroy();
+    expect(destroyResult).toBe(undefined); // i.e. did not throw
+    const queryWithDestroyedDbPromise = dbWithSinglePool
+      .selectFrom("Pets")
+      .selectAll()
+      .where("firstName", "=", "Lassie")
+      .executeTakeFirst();
+    await expect(
+      queryWithDestroyedDbPromise,
+    ).rejects.toThrowErrorMatchingInlineSnapshot(
+      "[Error: driver has already been destroyed]",
+    );
   });
 
   it("should work to switch between reader and writer when streaming", async () => {
@@ -231,21 +244,6 @@ describe.sequential("mysql replica dialect", async () => {
       .where("id", "=", 200)
       .executeTakeFirst();
     await expect(readDbPromise).rejects.toThrowErrorMatchingInlineSnapshot(
-      "[Error: Pool is closed.]",
-    );
-  });
-
-  it("will not destroy the same pool twice if same pool is used as arguments", async () => {
-    const newWritePool = getPool(writeContainer);
-    const newClient = new Kysely<TestDB>({
-      dialect: new MysqlReplicaDialect({
-        pools: { read: newWritePool, write: newWritePool },
-      }),
-    });
-    const destroyResult = await newClient.destroy();
-    expect(destroyResult).toBe(undefined); // i.e. "did not throw"
-    const promise = newClient.selectFrom("Users").selectAll().execute();
-    await expect(promise).rejects.toThrowErrorMatchingInlineSnapshot(
       "[Error: Pool is closed.]",
     );
   });
