@@ -74,6 +74,12 @@ describe.sequential("mysql replica dialect", async () => {
     await writeContainer.stop();
   });
 
+  it("should be possible to introspect the db", async () => {
+    const tables = await dbClient.introspection.getTables();
+    const tableNames = tables.map((table) => table.name);
+    expect(tableNames).toEqual(["Pets", "Users"]);
+  });
+
   it("should be able switch seamlessly between read and write pool", async () => {
     // Insert uses write db
     const userId = Number(
